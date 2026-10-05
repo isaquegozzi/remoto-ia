@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.remoto-state.json
+.remoto-pairing.json
+.vercel/
+.DS_Store
+*.log

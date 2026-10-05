@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "remoto-ia": {
+      "command": "node",
+      "args": ["C:/CAMINHO/remote-ia-v2/claude-channel/channel.mjs"],
+      "env": {
+        "REMOTO_CLAUDE_CHANNEL_TOKEN": "COLOQUE_UM_TOKEN_LONGO_AQUI"
+      }
+    }
+  }
+}

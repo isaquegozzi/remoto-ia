@@ -1,0 +1,16 @@
+{
+  "name": "remoto-ia-v2",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Host + interface web para controlar Codex e Claude Code separadamente.",
+  "main": "bridge.js",
+  "scripts": {
+    "host": "node bridge.js",
+    "relay": "node relay/relay-server.js",
+    "check": "node --check bridge.js && node --check app.js && node --check lib/codex-app-server.js && node --check lib/claude-cli.js && node --check lib/state-store.js && node --check relay/relay-client.js && node --check relay/relay-server.js"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}

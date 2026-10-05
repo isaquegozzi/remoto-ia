@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Remoto IA V2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Nunito:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="mobile-app-shell">
+  <header class="mobile-top-header">
+    <div class="top-bar-row">
+      <div class="host-status-cluster" onclick="openSettingsModal()">
+        <span class="brand-text">Remoto IA</span>
+        <span class="status-indicator-dot" id="nav-dot-indicator"></span>
+        <span class="host-pc-id" id="nav-host-id">Host offline</span>
+      </div>
+      <div class="header-right-actions">
+        <button class="pill-btn-subtle" onclick="runPingTest()">Atualizar</button>
+        <button class="pill-btn-subtle" onclick="toggleTheme()" id="theme-toggle-btn">Tema: Claro</button>
+        <button class="pill-btn-subtle" onclick="openSettingsModal()">Config</button>
+      </div>
+    </div>
+    <div class="agent-tabs-segmented">
+      <button class="segmented-tab active" id="tab-btn-codex" onclick="switchAgentTab('codex')">Codex Remote</button>
+      <button class="segmented-tab" id="tab-btn-claude" onclick="switchAgentTab('claude')">Claude Remote</button>
+    </div>
+  </header>
+
+  <div class="main-viewport-content">
+    <div id="codex-remote-container" class="agent-container active">
+      <div id="codex-list-screen" class="mobile-screen active">
+        <div class="search-box-container"><input class="search-input" placeholder="Pesquisar tarefas Codex..." onkeyup="filterThreads('codex',this.value)"></div>
+        <div class="projects-section">
+          <div class="mcp-status-header"><h2 class="section-title">Threads reais do Codex</h2><span class="badge-pill-sm" id="codex-sub-badge">Verificando</span></div>
+          <div class="project-dropdown-row"><span class="project-name" id="codex-active-project-label">Codex App Server</span><button class="icon-btn-subtle" onclick="createNewTask('codex')">+ Novo</button></div>
+        </div>
+        <div id="codex-threads-list" class="threads-list"></div>
+        <div class="floating-bottom-dock"><button class="floating-pill-btn" onclick="createNewTask('codex')">+ Nova tarefa</button></div>
+      </div>
+      <div id="codex-detail-screen" class="mobile-screen flex-screen">
+        <div class="detail-header"><button class="back-btn" onclick="closeThreadDetail('codex')">&larr; Voltar</button><div class="detail-header-info"><h3 id="codex-chat-title" class="detail-title">Codex</h3><span id="codex-chat-sub" class="detail-subtitle"></span></div><button class="icon-btn-subtle" onclick="interruptCurrent('codex')">Parar</button></div>
+        <div id="codex-chat-feed" class="chat-messages-container"></div>
+        <div class="chat-bottom-input-bar">
+          <button class="btn-mode-toggle" id="btn-codex-send-mode" onclick="toggleSendMode('codex')"><span id="codex-mode-icon">+</span><span id="codex-mode-label">Sequência</span></button>
+          <input id="codex-input-field" class="chat-input" placeholder="Instrução para Codex..." onkeydown="if(event.key==='Enter')sendChatMessage('codex')">
+          <button class="btn-send-pill" onclick="sendChatMessage('codex')">Enviar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="claude-remote-container" class="agent-container">
+      <div id="claude-list-screen" class="mobile-screen active">
+        <div class="search-box-container"><input class="search-input" placeholder="Pesquisar sessões Claude..." onkeyup="filterThreads('claude',this.value)"></div>
+        <div class="projects-section">
+          <div class="mcp-status-header"><h2 class="section-title">Sessões Claude Code</h2><span class="badge-pill-sm" id="claude-sub-badge">Verificando</span></div>
+          <p class="caption-sm text-mute">Usa o Claude Code instalado e autenticado no próprio PC host.</p>
+        </div>
+        <div id="claude-threads-list" class="threads-list"></div>
+        <div class="floating-bottom-dock"><button class="floating-pill-btn" onclick="createNewTask('claude')">+ Nova sessão</button></div>
+      </div>
+      <div id="claude-detail-screen" class="mobile-screen flex-screen">
+        <div class="detail-header"><button class="back-btn" onclick="closeThreadDetail('claude')">&larr; Voltar</button><div class="detail-header-info"><h3 id="claude-chat-title" class="detail-title">Claude</h3><span id="claude-chat-sub" class="detail-subtitle"></span></div><button class="icon-btn-subtle" onclick="interruptCurrent('claude')">Parar</button></div>
+        <div id="claude-chat-feed" class="chat-messages-container"></div>
+        <div class="chat-bottom-input-bar">
+          <select id="claude-model-select" class="model-select-pill"><option value="sonnet">Sonnet</option><option value="opus">Opus</option><option value="haiku">Haiku</option><option value="fable">Fable</option></select>
+          <input id="claude-input-field" class="chat-input" placeholder="Instrução para Claude..." onkeydown="if(event.key==='Enter')sendChatMessage('claude')">
+          <button class="btn-send-pill" onclick="sendChatMessage('claude')">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-gateway" class="modal-backdrop hidden">
+  <div class="modal-card">
+    <div class="modal-header"><div><h3 class="heading-md">Conexão com o Host</h3><p class="caption-sm text-mute">Local no PC ou Relay WebSocket para acesso externo</p></div><button class="btn-close-modal" onclick="closeSettingsModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="mode-switch-group-3">
+        <button class="btn-mode-tab active" id="mode-sub-btn" onclick="selectConnectionMode('sub')">Host Local</button>
+        <button class="btn-mode-tab" id="mode-relay-btn" onclick="selectConnectionMode('relay')">Relay Web</button>
+        <button class="btn-mode-tab" id="mode-api-btn" disabled>API direta: não</button>
+      </div>
+      <div id="form-sub-container" class="config-form-section">
+        <div class="callout-subtle"><p class="body-sm"><strong>Local:</strong> use esta opção no navegador do mesmo PC. O frontend fala com <code>127.0.0.1:8081</code> e exige o token mostrado pelo Host.</p></div>
+        <div class="form-field mt-3"><label class="caption-sm text-mute">URL do Host</label><input id="local-bridgeurl-input" class="text-input" value="http://127.0.0.1:8081"></div>
+        <div class="form-field mt-2"><label class="caption-sm text-mute">Pairing token</label><input id="local-token-input" class="text-input" placeholder="Cole o token mostrado por npm run host"></div>
+        <div class="form-field mt-2"><button class="button-primary btn-full-width" onclick="connectSubscriptionOneClick('codex')">Login ChatGPT/Codex por Device Code</button></div>
+        <div class="form-field mt-2"><button class="button-secondary btn-full-width" onclick="connectSubscriptionOneClick('claude')">Verificar Claude Code</button></div>
+      </div>
+      <div id="form-relay-container" class="config-form-section hidden">
+        <div class="callout-subtle"><p class="body-sm"><strong>Relay:</strong> o Host PC conecta para fora via WSS. O celular usa o mesmo Host ID e token. Não existe acesso a <code>localhost</code> do telefone.</p></div>
+        <div class="form-field mt-3"><label class="caption-sm text-mute">WebSocket Relay</label><input id="relay-bridgeurl-input" class="text-input" placeholder="wss://relay.seudominio.com"></div>
+        <div class="form-field mt-2"><label class="caption-sm text-mute">Host ID</label><input id="relay-hostid-input" class="text-input" placeholder="DESKTOP-XXXX"></div>
+        <div class="form-field mt-2"><label class="caption-sm text-mute">Pairing token</label><input id="relay-token-input" class="text-input" placeholder="Mesmo token do Host"></div>
+      </div>
+      <div id="form-api-container" class="config-form-section hidden"></div>
+      <div id="ping-test-result" class="ping-result-box hidden mt-3"><span class="status-indicator-dot" id="ping-dot"></span><span id="ping-test-text"></span></div>
+    </div>
+    <div class="modal-footer"><button class="button-secondary" onclick="runPingTest()">Testar</button><button class="button-primary" onclick="saveConnectionSettings()">Salvar</button></div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
