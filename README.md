@@ -1,6 +1,6 @@
 # Remoto IA
 
-Interface web para comar agentes de código (Codex e Claude Code) a partir do celular. O agente roda no computador, usando o ambiente real dele; o celular é só o controle.
+Interface web para comandar agentes de código (Codex e Claude Code) a partir do celular. O agente roda no computador, usando o ambiente real dele; o celular é só o controle.
 
 A ideia é simples: o celular não executa uma versão reduzida do agente. Ele se conecta ao Codex ou ao Claude Code que já estão instalados no PC e manda instruções para eles.
 
@@ -201,10 +201,10 @@ Para acessar de fora da rede local, use o relay. Não tente apontar a página ho
 
 **Defeitos e limitações conhecidos:**
 
-- O modo Claude por CLI **não tem fila nem steer**. Se a sessão já está executando, enviar outra mensagem retorna um erro pedindo que a execução seja interrompida primeiro. Isso vale para o Codex não.
+- O modo Claude por CLI **não tem fila nem steer**. Se a sessão já está executando, enviar outra mensagem retorna um erro pedindo que a execução seja interrompida primeiro. Essa limitação não se aplica ao Codex.
 - Aprovações que dependem de interação são limitadas no modo não-interativo do Claude.
 - O relay serve `ws://` puro, sem TLS, escuta em todas as interfaces e tem o endpoint de status HTTP público, sem autenticação.
-- O relay exige apenas `hostId` e um token de no mínimo 32 caracteres. Não há contas, rate limiting nem expiração de sessão.
+- O relay exige apenas `hostId` e um token de no mínimo 32 caracteres. Não há contas de usuário, limite de requisições nem expiração de sessão.
 - Um único token dá acesso a **todos** os agentes do host. Não há separação por usuário.
 - O pairing token é impresso em texto claro no terminal e gravado em texto claro em `.remoto-state.json`. No modo relay ele trafega dentro do JSON do WebSocket, e o token do SSE vai na query string. O frontend o guarda no `localStorage`.
 - Existem funções vazias no frontend: `toggleProjectMenu()`, `closeDiffModal()` e `togglePasswordVisibility()`. `openOptionsModal()` é apenas um apelido para a interrupção, e `generateNewPairingCode()` só mostra um aviso.
@@ -232,7 +232,7 @@ Todos os itens abaixo estão na lista de segurança do próprio projeto, antes d
 - armazenamento seguro de credenciais no servidor;
 - isolamento entre usuários e hosts.
 
-Mais os dois itens pendentes de status: a aprovação remota do Claude no modo CLI e a autenticação multiusuário do relay.
+Também faltam a aprovação remota do Claude no modo CLI e a autenticação multiusuário do relay.
 
 ## Testes
 
